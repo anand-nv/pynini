@@ -33,8 +33,8 @@
 FROM quay.io/pypa/manylinux2014_x86_64 AS common
 
 # The versions we want in the wheels.
-ENV FST_VERSION "1.8.2"
-ENV PYNINI_VERSION "2.1.5"
+ENV FST_VERSION "1.8.2.post1".
+ENV PYNINI_VERSION "2.1.5.post1"
 
 # ***********************************************************************
 # *** Image providing all the requirements for building Pynini wheels ***
@@ -43,7 +43,7 @@ FROM common AS wheel-building-env
 
 # Location of OpenFst and Pynini.
 ENV FST_DOWNLOAD_PREFIX "https://www.openfst.org/twiki/pub/FST/FstDownload"
-ENV PYNINI_DOWNLOAD_PREFIX "https://www.opengrm.org/twiki/pub/GRM/PyniniDownload"
+ENV PYNINI_DOWNLOAD_PREFIX "https://github.com/anand-nv/pynini/archive/refs/tags"
 
 # Gets and unpack OpenFst source.
 RUN yum install -y wget
@@ -58,9 +58,10 @@ RUN cd "/tmp/openfst-${FST_VERSION}" \
     && make --jobs 4 install \
     && rm -rd "/tmp/openfst-${FST_VERSION}"
 
+RUN echo wqqwe
 # Gets and unpacks Pynini source.
 RUN mkdir -p /src && cd /src \
-    && wget --quiet --no-check-certificate "${PYNINI_DOWNLOAD_PREFIX}/pynini-${PYNINI_VERSION}.tar.gz" \
+    && wget --quiet --no-check-certificate -O "pynini-${PYNINI_VERSION}.tar.gz" "${PYNINI_DOWNLOAD_PREFIX}/v${PYNINI_VERSION}.tar.gz" \
     && tar -xzf "pynini-${PYNINI_VERSION}.tar.gz" \
     && rm "pynini-${PYNINI_VERSION}.tar.gz"
 

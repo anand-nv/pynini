@@ -1,3 +1,15 @@
+v. 2.1.7 (compatible with OpenFst 1.8.4)
+========================================
+
+* Drops support for Python 3.8
+
+v. 2.1.6.post1 (compatible with OpenFst 1.8.3)
+========================================
+
+* Fixes versioning issue
+* Drops support for Python 3.6-3.7
+* Adds support for Python 3.13
+
 v. 2.1.6 (compatible with OpenFst 1.8.3)
 ========================================
 

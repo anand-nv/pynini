@@ -29,18 +29,14 @@
 # ******************************************************
 # *** All the following images are based on this one ***
 # ******************************************************
-from quay.io/pypa/manylinux_2_28_x86_64 AS common
+FROM quay.io/pypa/manylinux_2_28_x86_64 AS common
 
 # The versions we want in the wheels.
-ENV FST_VERSION "1.8.3"
-ENV PYNINI_VERSION "2.1.6.post1"
+ENV FST_VERSION "1.8.4"
+ENV PYNINI_VERSION "2.1.7"
 
-# Python 3.6m and 3.7m are end-of-life. The code genreated by Cython appears to
-# be incompatble with the Python 3.13t CPython API.
-RUN rm -rd \
-    /opt/python/cp36-cp36m \
-    /opt/python/cp37-cp37m \
-    /opt/python/cp313-cp313t
+# Python 3.8 is end-of-life.
+RUN rm -rd /opt/python/cp38-cp38
 
 # ***********************************************************************
 # *** Image providing all the requirements for building Pynini wheels ***
@@ -63,7 +59,7 @@ RUN cd /tmp \
 # Compiles OpenFst.
 RUN cd "/tmp/openfst-${FST_VERSION}" \
     && ./configure --enable-grm \
-    && make --jobs 4 install \
+    && make -j install \
     && rm -rd "/tmp/openfst-${FST_VERSION}"
 
 # Gets and unpacks Pynini source.
@@ -101,7 +97,7 @@ RUN rm -rd /tmp/wheelhouse
 # *******************************************************
 # *** Installs wheels in a fresh (OpenFst-free) image ***
 # *******************************************************
-FROM common AS install-pynini-from-wheel
+FROM common AS install-pynini-from-wheels
 
 # Grabs the wheels (but just the wheels) from the previous image.
 COPY --from=build-wheels /wheelhouse /wheelhouse
@@ -114,7 +110,7 @@ done
 # ***************************
 # *** Runs Pynini's tests ***
 # ***************************
-FROM install-pynini-from-wheel AS run-tests
+FROM install-pynini-from-wheels AS run-tests
 
 # Copies Pynini's tests and testing assets.
 COPY --from=wheel-building-env "/src/pynini-${PYNINI_VERSION}/tests" /tests
